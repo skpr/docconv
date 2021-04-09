@@ -9,10 +9,10 @@ import (
 	"io"
 	"strings"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 
-	TSP "code.sajari.com/docconv/iWork"
-	"code.sajari.com/docconv/snappy"
+	TSP "code.sajari.com/docconv/v2/iWork"
+	"code.sajari.com/docconv/v2/snappy"
 )
 
 // ConvertPages converts a Pages file to text.
@@ -20,7 +20,7 @@ func ConvertPages(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	var textBody string
 
-	b, err := io.ReadAll(r)
+	b, err := io.ReadAll(io.LimitReader(r, maxBytes))
 	if err != nil {
 		return "", nil, fmt.Errorf("error reading data: %v", err)
 	}
@@ -47,8 +47,17 @@ func ConvertPages(r io.Reader) (string, map[string]string, error) {
 			rc, _ := f.Open()
 			defer rc.Close()
 			bReader := bufio.NewReader(snappy.NewReader(io.MultiReader(strings.NewReader("\xff\x06\x00\x00sNaPpY"), rc)))
-			archiveLength, err := binary.ReadVarint(bReader)
-			archiveInfoData, err := io.ReadAll(io.LimitReader(bReader, archiveLength))
+
+			// Ignore error.
+			// NOTE: This error was unchecked. Need to revisit this to see if it
+			// should be acted on.
+			archiveLength, _ := binary.ReadVarint(bReader)
+
+			// Ignore error.
+			// NOTE: This error was unchecked. Need to revisit this to see if it
+			// should be acted on.
+			archiveInfoData, _ := io.ReadAll(io.LimitReader(bReader, archiveLength))
+
 			archiveInfo := &TSP.ArchiveInfo{}
 			err = proto.Unmarshal(archiveInfoData, archiveInfo)
 			fmt.Println("archiveInfo:", archiveInfo, err)
