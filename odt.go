@@ -13,7 +13,7 @@ func ConvertODT(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	var textBody string
 
-	b, err := io.ReadAll(r)
+	b, err := io.ReadAll(io.LimitReader(r, maxBytes))
 	if err != nil {
 		return "", nil, err
 	}

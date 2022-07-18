@@ -39,7 +39,7 @@ func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 		size = si.Size()
 		ra = f
 	} else {
-		b, err := io.ReadAll(r)
+		b, err := io.ReadAll(io.LimitReader(r, maxBytes))
 		if err != nil {
 			return "", nil, nil
 		}
@@ -119,7 +119,7 @@ func getContentTypeDefinition(zf *zip.File) (*contentTypeDefinition, error) {
 	defer f.Close()
 
 	x := &contentTypeDefinition{}
-	if err := xml.NewDecoder(f).Decode(x); err != nil {
+	if err := xml.NewDecoder(io.LimitReader(f, maxBytes)).Decode(x); err != nil {
 		return nil, err
 	}
 	return x, nil
