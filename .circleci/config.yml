@@ -85,7 +85,7 @@ workflows:
       - build:
           filters:
             branches:
-              ignore: master
+              only: master
           matrix:
             parameters:
               executor: *platforms
