@@ -69,9 +69,9 @@ jobs:
             docker manifest push docker.io/skpr/docconv:alpine<< parameters.alpine >>
 
 workflows:
-  release:
+  test:
     jobs:
-      - build_test:
+      - build:
           filters:
             branches:
               ignore: master
@@ -80,10 +80,12 @@ workflows:
               executor: *platforms
               alpine: *alpine
 
+  release:
+    jobs:
       - build:
           filters:
             branches:
-              only: master
+              ignore: master
           matrix:
             parameters:
               executor: *platforms
@@ -94,5 +96,5 @@ workflows:
             parameters:
               alpine: *alpine
           requires:
-            - build_and_push
+            - build
             
