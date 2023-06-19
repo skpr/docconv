@@ -16,18 +16,19 @@ platforms: &platforms
   - arm64
 
 alpine: &alpine
-  - "3.14"
-  - "3.15"
   - "3.16"
   - "3.17"
 
 jobs:
-  build_and_push:
+  build:
     parameters:
       executor:
         type: string
       alpine:
         type: string
+      push:
+        type: boolean
+        default: true
     machine: true
     executor: << parameters.executor >>
     steps:
@@ -35,10 +36,16 @@ jobs:
       - run:
           name: Build and Push
           command: |
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
-            IMAGE=docker.io/skpr/docconv:alpine<< parameters.alpine >>-<< parameters.executor >>
-            docker build --build-arg alpine_version=<< parameters.alpine >> -t ${IMAGE} .
-            docker push ${IMAGE}
+            docker build --build-arg alpine_version=<< parameters.alpine >> -t docker.io/skpr/docconv:alpine<< parameters.alpine >>-<< parameters.executor >> .
+      - when:
+          condition:
+            equal: [ true, << parameters.push >> ]
+          steps:
+            - run:
+                name: "Push image"
+                command: |
+                  docker login -u $DOCKER_USER -p $DOCKER_PASS
+                  docker push docker.io/skpr/docconv:alpine<< parameters.alpine >>-<< parameters.executor >>
 
   manifest:
     parameters:
@@ -64,7 +71,16 @@ jobs:
 workflows:
   release:
     jobs:
-      - build_and_push:
+      - build_test:
+          filters:
+            branches:
+              ignore: master
+          matrix:
+            parameters:
+              executor: *platforms
+              alpine: *alpine
+
+      - build:
           filters:
             branches:
               only: master
