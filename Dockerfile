@@ -1,5 +1,5 @@
-ARG alpine_version=3.14
-FROM golang:1.19-alpine${alpine_version} as build
+ARG alpine_version=3.18
+FROM golang:1.21-alpine${alpine_version} as build
 
 RUN apk add make \
             cmake \
@@ -15,7 +15,7 @@ COPY . /go/src/code.sajari.com/docconv
 
 RUN go build -o dist/docconv -tags ocr code.sajari.com/docconv/docd
 
-ARG alpine_version=3.14
+ARG alpine_version=3.18
 FROM alpine:${alpine_version}
 
 RUN apk add tesseract-ocr \
