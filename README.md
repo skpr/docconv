@@ -77,10 +77,6 @@ The `docd` tool runs as either:
 ### Optional flags
 
 - `addr` - the bind address for the HTTP server, default is ":8888"
-- `log-level`
-  - 0: errors & critical info
-  - 1: inclues 0 and logs each request as well
-  - 2: include 1 and logs the response payloads
 - `readability-length-low` - sets the readability length low if the ?readability=1 parameter is set
 - `readability-length-high` - sets the readability length high if the ?readability=1 parameter is set
 - `readability-stopwords-low` - sets the readability stopwords low if the ?readability=1 parameter is set
@@ -91,11 +87,8 @@ The `docd` tool runs as either:
 
 ### How to start the service
 
-    $ # This will only log errors and critical info
-    $ docd -log-level 0
-
-    $ # This will run on port 8000 and log each request
-    $ docd -addr :8000 -log-level 1
+    $ # This runs on port 8000
+    $ docd -addr :8000
 
 ## Example usage (code)
 
@@ -112,7 +105,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	"code.sajari.com/docconv"
 )
@@ -120,7 +112,7 @@ import (
 func main() {
 	res, err := docconv.ConvertPath("your-file.pdf")
 	if err != nil {
-		log.Fatal(err)
+		// TODO: handle
 	}
 	fmt.Println(res)
 }
@@ -133,7 +125,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	"code.sajari.com/docconv/client"
 )
@@ -144,7 +135,7 @@ func main() {
 
 	res, err := client.ConvertPath(c, "your-file.pdf")
 	if err != nil {
-		log.Fatal(err)
+		// TODO: handle
 	}
 	fmt.Println(res)
 }
