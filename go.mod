@@ -4,10 +4,10 @@ go 1.21.1
 
 require (
 	github.com/JalfResi/justext v0.0.0-20221106200834-be571e3e3052
-	github.com/advancedlogic/GoOse v0.0.0-20230923151002-b0edce1b52f8
-	github.com/golang/protobuf v1.5.3
+	github.com/advancedlogic/GoOse v0.0.0-20231203033844-ae6b36caf275
+	github.com/golang/protobuf v1.5.4
 	github.com/otiai10/gosseract/v2 v2.4.1
-	golang.org/x/net v0.15.0
+	golang.org/x/net v0.25.0
 )
 
 require (
@@ -23,6 +23,6 @@ require (
 	github.com/olekukonko/tablewriter v0.0.0-20180506121414-d4647c9c7a84 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
-	golang.org/x/text v0.13.0 // indirect
-	google.golang.org/protobuf v1.26.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 )
