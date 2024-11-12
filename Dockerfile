@@ -1,5 +1,5 @@
 ARG alpine_version=3.18
-FROM golang:1.21-alpine${alpine_version} as build
+FROM golang:1.23-alpine${alpine_version} as build
 
 RUN apk add make \
             cmake \

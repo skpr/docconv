@@ -19,6 +19,14 @@ $ go install code.sajari.com/docconv/v2/docd@latest
 
 See `go help install` for details on the installation location of the installed `docd` executable. Make sure that the full path to the executable is in your `PATH` environment variable.
 
+## Build
+
+```
+docker run -it -v $(pwd):/go/src/github.com/skpr/docconv -w /go/src/github.com/skpr/docconv golang:1.23-alpine3.11 /bin/sh -c "./build.sh 3.11"
+docker run -it -v $(pwd):/go/src/github.com/skpr/docconv -w /go/src/github.com/skpr/docconv golang:1.23-alpine3.12 /bin/sh -c "./build.sh 3.12"
+docker run -it -v $(pwd):/go/src/github.com/skpr/docconv -w /go/src/github.com/skpr/docconv golang:1.23-alpine3.13 /bin/sh -c "./build.sh 3.13"
+```
+
 ## Dependencies
 
 - tidy
