@@ -11,9 +11,9 @@ define pushimage
 endef
 
 build:
-	$(call buildimage,3.17)
-	$(call buildimage,3.18)
+	$(call buildimage,3.19)
+	$(call buildimage,3.20)
 
 push:
-	$(call pushimage,3.17)
-	$(call pushimage,3.18)
+	$(call pushimage,3.19)
+	$(call pushimage,3.20)

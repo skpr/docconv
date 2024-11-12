@@ -7,12 +7,11 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"strings"
 
 	"github.com/golang/protobuf/proto"
 
-	"code.sajari.com/docconv/iWork"
+	TSP "code.sajari.com/docconv/iWork"
 	"code.sajari.com/docconv/snappy"
 )
 
@@ -21,7 +20,7 @@ func ConvertPages(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	var textBody string
 
-	b, err := ioutil.ReadAll(r)
+	b, err := io.ReadAll(r)
 	if err != nil {
 		return "", nil, fmt.Errorf("error reading data: %v", err)
 	}
@@ -49,7 +48,7 @@ func ConvertPages(r io.Reader) (string, map[string]string, error) {
 			defer rc.Close()
 			bReader := bufio.NewReader(snappy.NewReader(io.MultiReader(strings.NewReader("\xff\x06\x00\x00sNaPpY"), rc)))
 			archiveLength, err := binary.ReadVarint(bReader)
-			archiveInfoData, err := ioutil.ReadAll(io.LimitReader(bReader, archiveLength))
+			archiveInfoData, err := io.ReadAll(io.LimitReader(bReader, archiveLength))
 			archiveInfo := &TSP.ArchiveInfo{}
 			err = proto.Unmarshal(archiveInfoData, archiveInfo)
 			fmt.Println("archiveInfo:", archiveInfo, err)

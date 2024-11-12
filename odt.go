@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"time"
 )
 
@@ -14,7 +13,7 @@ func ConvertODT(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	var textBody string
 
-	b, err := ioutil.ReadAll(r)
+	b, err := io.ReadAll(r)
 	if err != nil {
 		return "", nil, err
 	}
