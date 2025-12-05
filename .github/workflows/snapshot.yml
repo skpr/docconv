@@ -14,13 +14,13 @@ jobs:
           curl https://mise.run | sh
           mise install
 
-      - name: Set up QEMU
+      - name: ⚙️ Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - name: Set up Docker Buildx
+      - name: ⚙️ Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Run GoReleaser Snapshot
+      - name: 🚀 Create Snapshot Release
         run: mise snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

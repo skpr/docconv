@@ -22,7 +22,7 @@ release:
 nfpms:
   - package_name: docconv
     license: MIT
-    maintainer: Skpr
+    maintainer: admin@skpr.com.au
     homepage: https://github.com/skpr/docconv
     description: Fork of https://github.com/sajari/docconv to add additional package formats.
     formats: [ apk ]
@@ -35,6 +35,9 @@ nfpms:
           - tesseract-ocr
           - tesseract-ocr-dev
           - poppler-utils
+    apk:
+      signature:
+        key_file: skpr.rsa
 
 dockers_v2:
   - images:
