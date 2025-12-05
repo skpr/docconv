@@ -13,17 +13,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-
-      - name: Install dependencies
-        run: sudo apt install wv unrtf tidy mise
-
       - name: Set up Go ${{ env.GO_VERSION }}
         uses: actions/setup-go@v6
         with:
           go-version: ${{ env.GO_VERSION }}
-
+      - name: 📦 Install Mise
+        run: |
+          curl https://mise.run | sh
+          mise install
+      - name: Install dependencies
+        run: sudo apt install wv unrtf tidy
       - name: Build
         run: mise build
-
       - name: Test
         run: mise test
