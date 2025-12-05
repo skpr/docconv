@@ -46,8 +46,18 @@ jobs:
       - name: 📤 Upload APKs to S3
         run: |
           VERSION=${GITHUB_TAG}
-          aws s3 cp ./dist/docconv_${VERSION}_linux_arm64.apk s3://package-skpr-io/docconv/${VERSION}/aarch64/docconv_${VERSION}.apk --acl public-read --cache-control "max-age=86400"
-          aws s3 cp ./dist/docconv_${VERSION}_linux_amd64.apk s3://package-skpr-io/docconv/${VERSION}/x86_64/docconv_${VERSION}.apk --acl public-read --cache-control "max-age=86400"
+          aws s3 sync \
+            ./dist/docconv_${VERSION}_linux_arm64.apk \
+            s3://package-skpr-io/docconv/${VERSION}/aarch64/docconv_${VERSION}.apk \
+            --acl public-read \
+            --cache-control "max-age=86400" \
+            --delete          
+          aws s3 sync \
+            ./dist/docconv_${VERSION}_linux_amd64.apk \
+            s3://package-skpr-io/docconv/${VERSION}/x86_64/docconv_${VERSION}.apk \
+            --acl public-read \
+            --cache-control "max-age=86400" \
+            --delete
           # upload public key for validating repository packages.
           aws s3 cp skpr.rsa.pub s3://package-skpr-io/docconv/skpr.rsa.pub --acl public-read
 
