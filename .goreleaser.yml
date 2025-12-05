@@ -3,8 +3,7 @@ project_name: docconv
 version: 2
 
 builds:
-  - id: docconv-build
-    main: ./docd
+  - main: ./docd
     binary: docconv
     ldflags:
       - -extldflags '-static'
@@ -21,8 +20,7 @@ release:
     name: docconv
 
 nfpms:
-  - id: docconv-package
-    package_name: docconv
+  - package_name: docconv
     license: MIT
     maintainer: Skpr
     homepage: https://github.com/skpr/docconv
@@ -48,3 +46,5 @@ dockers_v2:
     platforms:
       - linux/amd64
       - linux/arm64
+    build_args:
+      ALPINE_VERSION: "3.23"
