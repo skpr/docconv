@@ -10,7 +10,7 @@ import (
 // Errors & warnings are deliberately suppressed as underlying tools
 // throw warnings very easily.
 func Tidy(r io.Reader, xmlIn bool) ([]byte, error) {
-	f, err := os.CreateTemp(os.TempDir(), "/docconv")
+	f, err := os.CreateTemp(os.TempDir(), "docconv")
 	if err != nil {
 		return nil, err
 	}

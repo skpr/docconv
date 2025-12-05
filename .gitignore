@@ -2,3 +2,4 @@
 sajari-convert
 *tests/
 /dist
+/vendor

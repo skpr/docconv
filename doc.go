@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"os/exec"
-	"strings"
 	"time"
+
+	"github.com/richardlehane/mscfb"
+	"github.com/richardlehane/msoleps"
 )
 
 // ConvertDoc converts an MS Word .doc to text.
@@ -22,28 +23,45 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 	// Meta data
 	mc := make(chan map[string]string, 1)
 	go func() {
+		defer func() {
+			if e := recover(); e != nil {
+				// TODO: Propagate error.
+			}
+		}()
+
 		meta := make(map[string]string)
-		metaStr, err := exec.Command("wvSummary", f.Name()).Output()
+
+		doc, err := mscfb.New(f)
 		if err != nil {
-			// TODO: Remove this.
-			log.Println("wvSummary:", err)
+			// TODO: Propagate error.
+			mc <- meta
+			return
 		}
 
-		// Parse meta output
-		for _, line := range strings.Split(string(metaStr), "\n") {
-			if parts := strings.SplitN(line, "=", 2); len(parts) > 1 {
-				meta[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+		props := msoleps.New()
+		for entry, err := doc.Next(); err == nil; entry, err = doc.Next() {
+			if msoleps.IsMSOLEPS(entry.Initial) {
+				if err := props.Reset(doc); err != nil {
+					// TODO: Propagate error.
+					break
+				}
+
+				for _, prop := range props.Property {
+					meta[prop.Name] = prop.String()
+				}
 			}
 		}
 
+		const defaultTimeFormat = "2006-01-02 15:04:05.999999999 -0700 MST"
+
 		// Convert parsed meta
-		if tmp, ok := meta["Last Modified"]; ok {
-			if t, err := time.Parse(time.RFC3339, tmp); err == nil {
+		if tmp, ok := meta["LastSaveTime"]; ok {
+			if t, err := time.Parse(defaultTimeFormat, tmp); err == nil {
 				meta["ModifiedDate"] = fmt.Sprintf("%d", t.Unix())
 			}
 		}
-		if tmp, ok := meta["Created"]; ok {
-			if t, err := time.Parse(time.RFC3339, tmp); err == nil {
+		if tmp, ok := meta["CreateTime"]; ok {
+			if t, err := time.Parse(defaultTimeFormat, tmp); err == nil {
 				meta["CreatedDate"] = fmt.Sprintf("%d", t.Unix())
 			}
 		}
@@ -54,27 +72,23 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 	// Document body
 	bc := make(chan string, 1)
 	go func() {
-
 		// Save output to a file
+		var buf bytes.Buffer
 		outputFile, err := os.CreateTemp("/tmp", "sajari-convert-")
 		if err != nil {
-			// TODO: Remove this.
-			log.Println("TempFile Out:", err)
+			bc <- buf.String()
 			return
 		}
 		defer os.Remove(outputFile.Name())
 
 		err = exec.Command("wvText", f.Name(), outputFile.Name()).Run()
 		if err != nil {
-			// TODO: Remove this.
-			log.Println("wvText:", err)
+			// TODO: Propagate error.
 		}
 
-		var buf bytes.Buffer
 		_, err = buf.ReadFrom(outputFile)
 		if err != nil {
-			// TODO: Remove this.
-			log.Println("wvText:", err)
+			// TODO: Propagate error.
 		}
 
 		bc <- buf.String()

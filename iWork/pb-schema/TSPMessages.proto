@@ -1,5 +1,7 @@
 syntax = "proto2";
 
+option go_package = "code.sajari.com/docconv/v2/tsp";
+
 package TSP;
 
 message Reference {
@@ -92,4 +94,3 @@ message ObjectContainer {
   optional uint32 identifier = 1;
   repeated .TSP.Reference objects = 2;
 }
-

@@ -1,0 +1,25 @@
+[tools]
+go = "1.25"
+"ubi:goreleaser/goreleaser" = "latest"
+
+[env]
+CGO_ENABLED=0
+LGFLAGS="-extldflags '-static'"
+
+[tasks.build]
+description = "Build the application"
+run = '''
+go build -v -o ./dist/docconv ./docd
+'''
+
+[tasks.test]
+description = "Run tests"
+run = "go test -v ./..."
+
+[tasks.snapshot]
+description = "Create a snapshot release with Goreleaser"
+run = "goreleaser release --snapshot --clean"
+
+[tasks.release]
+description = "Create a release with Goreleaser"
+run = "goreleaser release --clean"

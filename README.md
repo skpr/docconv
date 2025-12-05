@@ -1,11 +1,11 @@
 # docconv
 
-[![GoDoc](https://godoc.org/code.sajari.com/docconv?status.svg)](https://godoc.org/code.sajari.com/docconv)
-[![Build Status](https://travis-ci.org/sajari/docconv.svg?branch=master)](https://travis-ci.org/sajari/docconv)
+[![Go reference](https://pkg.go.dev/badge/code.sajari.com/docconv/v2.svg)](https://pkg.go.dev/code.sajari.com/docconv/v2)
+[![Build status](https://github.com/sajari/docconv/workflows/Go/badge.svg?branch=master)](https://github.com/sajari/docconv/actions)
+[![Report card](https://goreportcard.com/badge/code.sajari.com/docconv/v2)](https://goreportcard.com/report/code.sajari.com/docconv/v2)
+[![Sourcegraph](https://sourcegraph.com/github.com/sajari/docconv/v2/-/badge.svg)](https://sourcegraph.com/github.com/sajari/docconv/v2)
 
 A Go wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, ODT, Pages documents and images (see optional dependencies below) to plain text.
-
-> **Note for returning users:** the Go import path for this package been moved to `code.sajari.com/docconv`.
 
 ## Installation
 
@@ -13,9 +13,11 @@ If you haven't setup Go before, you first need to [install Go](https://golang.or
 
 To fetch and build the code:
 
-    $ go get code.sajari.com/docconv/...
+```console
+$ go install code.sajari.com/docconv/v2/docd@latest
+```
 
-This will also build the command line tool `docd` into `$GOPATH/bin`. Make sure that `$GOPATH/bin` is in your `PATH` environment variable.
+See `go help install` for details on the installation location of the installed `docd` executable. Make sure that the full path to the executable is in your `PATH` environment variable.
 
 ## Build
 
@@ -27,12 +29,25 @@ docker run -it -v $(pwd):/go/src/github.com/skpr/docconv -w /go/src/github.com/s
 
 ## Dependencies
 
-tidy, wv, popplerutils, unrtf, https://github.com/JalfResi/justext
+- tidy
+- wv
+- popplerutils
+- unrtf
+- https://github.com/JalfResi/justext
 
-Example install of dependencies (not all systems):
+### Debian-based Linux
 
-    $ sudo apt-get install poppler-utils wv unrtf tidy
-    $ go get github.com/JalfResi/justext
+```console
+$ sudo apt-get install poppler-utils wv unrtf tidy
+$ go get github.com/JalfResi/justext
+```
+
+### macOS
+
+```console
+$ brew install poppler-qt5 wv unrtf tidy-html5
+$ go get github.com/JalfResi/justext
+```
 
 ### Optional dependencies
 
@@ -40,11 +55,15 @@ To add image support to the `docconv` library you first need to [install and bui
 
 Now you can add `-tags ocr` to any `go` command when building/fetching/testing `docconv` to include support for processing images:
 
-    $ go get -tags ocr code.sajari.com/docconv/...
+```console
+$ go get -tags ocr code.sajari.com/docconv/v2/...
+```
 
 This may complain on macOS, which you can fix by installing [tesseract](https://tesseract-ocr.github.io) via brew:
 
-    $ brew install tesseract
+```console
+$ brew install tesseract
+```
 
 ## docd tool
 
@@ -56,27 +75,27 @@ The `docd` tool runs as either:
 
 2.  a service exposed from within a Docker container
 
-    This also runs as a service, but from within a Docker container. There are three build scripts:
+    This also runs as a service, but from within a Docker container.
+    Official images are published at https://hub.docker.com/r/sajari/docd.
 
-    - [./docd/debian.sh](./docd/debian.sh)
-    - [./docd/alpine.sh](./docd/alpine.sh)
-    - [./docd/appengine.sh](./docd/appengine.sh)
+    Optionally you can build it yourself:
 
-    The `debian` version uses the Debian package repository which can vary with builds. The `alpine` version uses a very cut down Linux distribution to produce a container ~40MB. It also locks the dependency versions for consistency, but may miss out on future updates. The `appengine` version is a flex based custom runtime for Google Cloud.
+    ```console
+    $ cd docd
+    $ docker build -t docd .
+    ```
 
 3.  via the command line.
 
     Documents can be sent as an argument, e.g.
 
-        $ docd -input document.pdf
+    ```console
+    $ docd -input document.pdf
+    ```
 
 ### Optional flags
 
 - `addr` - the bind address for the HTTP server, default is ":8888"
-- `log-level`
-  - 0: errors & critical info
-  - 1: inclues 0 and logs each request as well
-  - 2: include 1 and logs the response payloads
 - `readability-length-low` - sets the readability length low if the ?readability=1 parameter is set
 - `readability-length-high` - sets the readability length high if the ?readability=1 parameter is set
 - `readability-stopwords-low` - sets the readability stopwords low if the ?readability=1 parameter is set
@@ -87,11 +106,10 @@ The `docd` tool runs as either:
 
 ### How to start the service
 
-    $ # This will only log errors and critical info
-    $ docd -log-level 0
-
-    $ # This will run on port 8000 and log each request
-    $ docd -addr :8000 -log-level 1
+```console
+$ # This runs on port 8000
+$ docd -addr :8000
+```
 
 ## Example usage (code)
 
@@ -108,15 +126,14 @@ package main
 
 import (
 	"fmt"
-	"log"
 
-	"code.sajari.com/docconv"
+	"code.sajari.com/docconv/v2"
 )
 
 func main() {
 	res, err := docconv.ConvertPath("your-file.pdf")
 	if err != nil {
-		log.Fatal(err)
+		// TODO: handle
 	}
 	fmt.Println(res)
 }
@@ -129,9 +146,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 
-	"code.sajari.com/docconv/client"
+	"code.sajari.com/docconv/v2/client"
 )
 
 func main() {
@@ -140,8 +156,14 @@ func main() {
 
 	res, err := client.ConvertPath(c, "your-file.pdf")
 	if err != nil {
-		log.Fatal(err)
+		// TODO: handle
 	}
 	fmt.Println(res)
 }
+```
+
+Alternatively, via a `curl`:
+
+```console
+$ curl -s -F input=@your-file.pdf http://localhost:8888/convert
 ```

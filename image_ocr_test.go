@@ -1,5 +1,4 @@
 //go:build ocr
-// +build ocr
 
 package docconv
 

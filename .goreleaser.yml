@@ -1,0 +1,50 @@
+project_name: docconv
+
+version: 2
+
+builds:
+  - id: docconv-build
+    main: ./docd
+    binary: docconv
+    ldflags:
+      - -extldflags '-static'
+    env:
+      - CGO_ENABLED=0
+    goos: [ linux ]
+    goarch: [ amd64, arm64 ]
+
+release:
+  prerelease: auto
+  name_template: "docconv {{.Version}}"
+  github:
+    owner: skpr
+    name: docconv
+
+nfpms:
+  - id: docconv-package
+    package_name: docconv
+    license: MIT
+    maintainer: Skpr
+    homepage: https://github.com/skpr/docconv
+    description: Fork of https://github.com/sajari/docconv to add additional package formats.
+    formats: [ apk ]
+    dependencies:
+      - tesseract-ocr
+      - poppler-utils
+    overrides:
+      apk:
+        dependencies:
+          - tesseract-ocr
+          - tesseract-ocr-dev
+          - poppler-utils
+
+dockers_v2:
+  - images:
+      - "docker.io/skpr/docconv"
+      - "ghcr.io/skpr/docconv"
+    tags:
+      - "{{ .Version }}"
+      - "latest"
+    platforms:
+      - linux/amd64
+      - linux/arm64

@@ -1,16 +1,14 @@
 //go:build ocr
-// +build ocr
 
 package docconv
 
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 )
@@ -28,24 +26,19 @@ func compareExt(ext string, exts []string) bool {
 	return false
 }
 
-func cleanupTemp(tmpDir string) {
-	err := os.RemoveAll(tmpDir)
-	if err != nil {
-		log.Println(err)
-	}
-}
-
 func ConvertPDFImages(path string) (BodyResult, error) {
 	bodyResult := BodyResult{}
 
-	tmp, err := ioutil.TempDir(os.TempDir(), "tmp-imgs-")
+	tmp, err := os.MkdirTemp(os.TempDir(), "tmp-imgs-")
 	if err != nil {
 		bodyResult.err = err
 		return bodyResult, err
 	}
 	tmpDir := fmt.Sprintf("%s/", tmp)
 
-	defer cleanupTemp(tmpDir)
+	defer func() {
+		_ = os.RemoveAll(tmpDir) // ignore error
+	}()
 
 	_, err = exec.Command("pdfimages", "-j", path, tmpDir).Output()
 	if err != nil {
@@ -110,17 +103,17 @@ func ConvertPDFImages(path string) (BodyResult, error) {
 }
 
 // PdfHasImage verify if `path` (PDF) has images
-func PDFHasImage(path string) bool {
+func PDFHasImage(path string) (bool, error) {
 	cmd := "pdffonts -l 5 %s | tail -n +3 | cut -d' ' -f1 | sort | uniq"
-	out, err := exec.Command("bash", "-c", fmt.Sprintf(cmd, path)).Output()
+	out, err := exec.Command("bash", "-c", fmt.Sprintf(cmd, shellEscape(path))).CombinedOutput()
+
 	if err != nil {
-		log.Println(err)
-		return false
+		return false, err
 	}
 	if string(out) == "" {
-		return true
+		return true, nil
 	}
-	return false
+	return false, nil
 }
 
 func ConvertPDF(r io.Reader) (string, map[string]string, error) {
@@ -141,22 +134,43 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 		return "", nil, metaResult.err
 	}
 
-	if !PDFHasImage(f.Name()) {
+	hasImage, err := PDFHasImage(f.Name())
+	if err != nil {
+		return "", nil, fmt.Errorf("could not check if PDF has image: %w", err)
+	}
+	if !hasImage {
 		return bodyResult.body, metaResult.meta, nil
 	}
 
 	imageConvertResult, imageConvertErr := ConvertPDFImages(f.Name())
 	if imageConvertErr != nil {
-		log.Println(imageConvertErr)
-		return bodyResult.body, metaResult.meta, nil
+		return bodyResult.body, metaResult.meta, nil // ignore error, return what we have
 	}
 	if imageConvertResult.err != nil {
-		log.Println(imageConvertResult.err)
-		return bodyResult.body, metaResult.meta, nil
+		return bodyResult.body, metaResult.meta, nil // ignore error, return what we have
 	}
 
 	fullBody := strings.Join([]string{bodyResult.body, imageConvertResult.body}, " ")
 
 	return fullBody, metaResult.meta, nil
 
+}
+
+var shellEscapePattern *regexp.Regexp
+
+func init() {
+	shellEscapePattern = regexp.MustCompile(`[^\w@%+=:,./-]`)
+}
+
+// shellEscape returns a shell-escaped version of the string s. The returned value
+// is a string that can safely be used as one token in a shell command line.
+func shellEscape(s string) string {
+	if len(s) == 0 {
+		return "''"
+	}
+	if shellEscapePattern.MatchString(s) {
+		return "'" + strings.Replace(s, "'", "'\"'\"'", -1) + "'"
+	}
+
+	return s
 }

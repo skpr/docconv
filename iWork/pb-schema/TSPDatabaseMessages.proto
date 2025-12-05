@@ -1,5 +1,7 @@
 syntax = "proto2";
 
+option go_package = "code.sajari.com/docconv/v2/tsp";
+
 import "TSPMessages.proto";
 package TSP;
 
@@ -25,4 +27,3 @@ message DatabaseImageDataArchive {
   required .TSP.DatabaseDataArchive super = 1;
   required .TSP.DatabaseImageDataArchive.ImageType type = 2;
 }
-
