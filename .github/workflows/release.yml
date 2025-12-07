@@ -22,10 +22,11 @@ jobs:
       - name: ⚙️ Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: 🔑 Get signing key
+      - name: 🔑 Get signing keys
         run: |
           echo "${{ secrets.SKPR_PRIVATE_KEY }}" > skpr.rsa
-          chmod 600 skpr.rsa
+          echo "${{ secrets.SKPR_PUBLIC_KEY }}" > skpr.rsa.pub
+          chmod 600 skpr.rsa skpr.rsa.pub
 
       - name: 🚀 Publish Release
         run: mise release
