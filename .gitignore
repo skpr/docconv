@@ -1,4 +1,7 @@
 
 sajari-convert
 *tests/
+skpr.rsa
+skpr.rsa.pub
 /dist
+/vendor

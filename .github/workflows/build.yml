@@ -1,0 +1,27 @@
+name: 🏗️ Build
+
+on:
+  push:
+    branches: [main]
+  pull_request: ~
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: 📦 Install Mise
+        run: |
+          curl https://mise.run | sh
+          mise install
+
+      - name: Install dependencies
+        run: sudo apt install wv unrtf tidy
+
+      - name: Build
+        run: mise build
+
+      - name: Test
+        run: mise test
