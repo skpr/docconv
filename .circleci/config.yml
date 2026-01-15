@@ -16,7 +16,6 @@ platforms: &platforms
   - arm64
 
 alpine: &alpine
-  - "3.20"
   - "3.21"
   - "3.22"
 
