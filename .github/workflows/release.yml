@@ -1,0 +1,70 @@
+name: 🚀 Release
+
+on:
+  workflow_dispatch: ~
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+        alpine:
+          - "3.21"
+          - "3.23"
+    runs-on: ${{ matrix.platform.runner }}
+    env:
+      IMAGE: docker.io/skpr/docconv:alpine${{ matrix.alpine }}-${{ matrix.platform.arch }}
+    steps:
+      - name: ↙️ Checkout
+        uses: actions/checkout@v6
+        with:
+          show-progress: false
+
+      - name: 🔑 Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: 🏗️ Build
+        run: docker build --build-arg alpine_version=${{ matrix.alpine }} -t ${IMAGE} .
+
+      - name: 🚀 Push
+        run: docker push ${IMAGE}
+
+  manifest:
+    needs: build
+    strategy:
+      matrix:
+        alpine:
+          - "3.21"
+          - "3.23"
+    runs-on: ubuntu-24.04
+    env:
+      IMAGE: docker.io/skpr/docconv:alpine${{ matrix.alpine }}
+    steps:
+      - name: 🔑 Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: 🐋 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 📦 Push Manifest
+        run: |
+          docker buildx imagetools create -t ${IMAGE} \
+            ${IMAGE}-amd64 \
+            ${IMAGE}-arm64
