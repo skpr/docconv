@@ -1,8 +1,8 @@
 package goose
 
 import (
+	"io/ioutil"
 	"log"
-	"os"
 	"regexp"
 	"strings"
 
@@ -110,7 +110,7 @@ func (stop StopWords) SimpleLanguageDetector(text string) string {
 
 // ReadLinesOfFile returns the lines from a file as a slice of strings
 func ReadLinesOfFile(filename string) []string {
-	content, err := os.ReadFile(filename)
+	content, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Println(err.Error())
 	}
