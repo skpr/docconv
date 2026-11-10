@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"os"
+	"io/ioutil"
 )
 
 type ResourceFunc func() ([]byte, error)
@@ -121,7 +121,7 @@ func RegisterStoplist(name string, resourceFunc ResourceFunc) {
 */
 
 func ReadStoplist(filename string) (map[string]bool, error) {
-	data, err := os.ReadFile(filename)
+	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
