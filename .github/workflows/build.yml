@@ -1,0 +1,34 @@
+name: 🏗️ Build
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+        alpine:
+          - "3.21"
+          - "3.23"
+    runs-on: ${{ matrix.platform.runner }}
+    steps:
+      - name: ↙️ Checkout
+        uses: actions/checkout@v6
+        with:
+          show-progress: false
+
+      - name: 🏗️ Build
+        run: |
+          docker build --build-arg alpine_version=${{ matrix.alpine }} \
+            -t docker.io/skpr/docconv:alpine${{ matrix.alpine }}-${{ matrix.platform.arch }} .
