@@ -7,7 +7,7 @@ require (
 	github.com/advancedlogic/GoOse v0.0.0-20231203033844-ae6b36caf275
 	github.com/golang/protobuf v1.5.4
 	github.com/otiai10/gosseract/v2 v2.4.1
-	golang.org/x/net v0.30.0
+	golang.org/x/net v0.55.0
 )
 
 require (
@@ -24,6 +24,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
-	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	google.golang.org/protobuf v1.35.1 // indirect
 )
